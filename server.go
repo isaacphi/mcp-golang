@@ -554,6 +554,7 @@ func (s *Server) Serve() error {
 	pr.SetRequestHandler("prompts/get", s.handlePromptCalls)
 	pr.SetRequestHandler("resources/list", s.handleListResources)
 	pr.SetRequestHandler("resources/read", s.handleResourceCalls)
+	pr.SetRequestHandler("resources/templates/list", s.handleListTemplates)
 	err := pr.Connect(s.transport)
 	if err != nil {
 		return err
@@ -873,6 +874,11 @@ func (s *Server) handleResourceCalls(ctx context.Context, req *transport.BaseJSO
 		return nil, errors.Wrapf(err, "unknown prompt: %s", req.Method)
 	}
 	return resourceToUse.Handler(ctx), nil
+}
+
+func (s *Server) handleListTemplates(ctx context.Context, request *transport.BaseJSONRPCRequest, extra protocol.RequestHandlerExtra) (transport.JsonRpcBody, error) {
+	// TODO: implement
+	return map[string]interface{}{}, nil
 }
 
 func (s *Server) handlePing(ctx context.Context, request *transport.BaseJSONRPCRequest, extra protocol.RequestHandlerExtra) (transport.JsonRpcBody, error) {
