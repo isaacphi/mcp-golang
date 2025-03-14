@@ -26,7 +26,7 @@ func NewClient(transport transport.Transport) *Client {
 }
 
 // Initialize connects to the server and retrieves its capabilities
-func (c *Client) Initialize(ctx context.Context) (*InitializeResponse, error) {
+func (c *Client) Initialize(ctx context.Context, clientName, clientVersion string) (*InitializeResponse, error) {
 	if c.initialized {
 		return nil, errors.New("client already initialized")
 	}
@@ -36,8 +36,21 @@ func (c *Client) Initialize(ctx context.Context) (*InitializeResponse, error) {
 		return nil, errors.Wrap(err, "failed to connect transport")
 	}
 
+	params := map[string]interface{}{
+		"protocolVersion": "2024-11-05",
+		"capabilities": map[string]interface{}{
+			"resources": true,
+			"prompts":   true,
+			"tools":     true,
+		},
+		"clientInfo": map[string]interface{}{
+			"name":    clientName,
+			"version": clientVersion,
+		},
+	}
+
 	// Make initialize request to server
-	response, err := c.protocol.Request(ctx, "initialize", map[string]interface{}{}, nil)
+	response, err := c.protocol.Request(ctx, "initialize", params, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize")
 	}
